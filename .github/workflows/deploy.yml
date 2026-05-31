@@ -35,16 +35,12 @@ jobs:
 
       - name: Build Frontend Docker image
         run: |
-          docker build -f Dockerfile -t localhost:5000/habitpulse-web:latest .
+          docker build --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} -f Dockerfile -t localhost:5000/habitpulse-web:latest .
 
       - name: Push and Deploy Frontend
         run: |
           ssh -L 5000:localhost:5000 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} -N -f
           sleep 3
           docker push localhost:5000/habitpulse-web:latest
-          scp docker-compose.prod.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/projects/habitpulse-web/docker-compose.yml
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} '
-            cd /opt/projects/habitpulse-web &&
-            docker pull localhost:5000/habitpulse-web:latest &&
-            docker compose up -d --pull never
-          '
+          scp docker-compose.prod.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/projects/habitpulse-web/docker-compose.yml
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 'cd /opt/projects/habitpulse-web && docker pull localhost:5000/habitpulse-web:latest && docker compose up -d --pull never'
