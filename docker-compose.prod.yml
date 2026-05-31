@@ -1,0 +1,15 @@
+services:
+  web:
+    image: localhost:5000/habitpulse-web:latest
+    restart: always
+    networks:
+      - traefik-public
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.habitpulse-web.rule=Host(`habitpulse.adamtroszczynski.pl`)'
+      - 'traefik.http.routers.habitpulse-web.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.habitpulse-web.loadbalancer.server.port=3000'
+
+networks:
+  traefik-public:
+    external: true
